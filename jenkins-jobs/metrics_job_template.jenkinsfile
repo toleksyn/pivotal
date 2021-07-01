@@ -1,0 +1,58 @@
+#!groovy
+@Library('jenkins-pipeline-shared@master') _
+
+pipeline {
+    agent {
+        node {
+            label 'auto-test-j8-mvn-chrome-prod'
+        }
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '25'))
+        timestamps()
+        skipDefaultCheckout true
+        timeout(time: 5, unit: 'HOURS')
+    }
+
+    stages {
+        stage('checkout test automation repo') {
+            steps {
+                script {
+                    checkout([$class                           : 'GitSCM',
+                              branches                         : [[name: '${BRANCH}']],
+                              doGenerateSubmoduleConfigurations: false,
+                              extensions                       : [],
+                              submoduleCfg                     : [],
+                              userRemoteConfigs                : [[credentialsId: 'DIGITAL_GH', url: 'git@github.com:toleksyn/pivotal.git']]])
+                }
+            }
+        }
+
+        stage('run test suite') {
+            steps {
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    script {
+                        withCredentials([
+                                string(credentialsId: 'PIVOTAL_TOLEKSYN_TOKEN', variable: 'PIVOTAL_TOKEN')
+                        ])
+                                {
+                                    sh "sudo chmod +x gradlew"
+                                    sh "./gradlew -DdigitalProjectId=${DIGITAL_PROJECT_ID} -DmonitoringProjectId=${MONITORING_PROJECT_ID} \
+                                        -Ddigital_team=\"${DIGITAL_TEAM}\" -Dmonitoring_team=\"${MONITORING_TEAM}\" \
+                                        -Dnot_dev_labels=${NOT_DEV_LABELS} -Dpivotal_token=${PIVOTAL_TOKEN} \
+                                        -Dweek_label=${WEEK_LABEL} \
+                                          test --tests ${TESTS}"
+                                }
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '*.csv', fingerprint: true
+        }
+    }
+}
