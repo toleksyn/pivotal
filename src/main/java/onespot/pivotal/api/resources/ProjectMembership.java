@@ -47,7 +47,7 @@ public class ProjectMembership {
         this.kind = kind;
     }
 
-    public Person person() {
+    public Person getPerson() {
         return person;
     }
 

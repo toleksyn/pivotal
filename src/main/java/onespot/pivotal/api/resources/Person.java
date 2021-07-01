@@ -14,4 +14,8 @@ public class Person {
     public enum PersonFieldNames {
         id,name,email,initials,username,kind
     }
+
+    public String getName() {
+        return name;
+    }
 }
