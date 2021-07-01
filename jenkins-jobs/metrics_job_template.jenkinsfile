@@ -16,6 +16,17 @@ pipeline {
     }
 
     stages {
+
+        stage('install java 11') {
+            steps {
+                script {
+                    sh "sudo apt-get update"
+                    sh "sudo apt-get -qqy install openjdk-11-jdk"
+                    sh "java -version"
+                }
+            }
+        }
+
         stage('checkout test automation repo') {
             steps {
                 script {
