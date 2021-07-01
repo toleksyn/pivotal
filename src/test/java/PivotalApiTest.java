@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static java.lang.System.getProperty;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.stream.Collectors.joining;
@@ -36,7 +37,7 @@ public class PivotalApiTest {
         storiesDoneMonitoring.add(new String[] {"Not dev total", String.valueOf(notDevStoriesTotal)});
         storiesDone.addAll(storiesDoneMonitoring);
 
-        var csvOutputFile = new File("metrics.csv");
+        var csvOutputFile = new File(format("metrics_%s.csv", getLastWeekLabel()));
         try (var printWriter = new PrintWriter(csvOutputFile)) {
             storiesDone
                     .stream()
