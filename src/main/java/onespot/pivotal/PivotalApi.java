@@ -36,7 +36,12 @@ public class PivotalApi {
                 .withState(Story.StoryState.delivered)
                 .getAll();
 
+        var finishedStories = stories
+                .withState(Story.StoryState.finished)
+                .getAll();
+
         acceptedStories.addAll(deliveredStories);
+        acceptedStories.addAll(finishedStories);
 
         return acceptedStories;
     }
