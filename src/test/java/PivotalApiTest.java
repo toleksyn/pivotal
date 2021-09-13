@@ -11,7 +11,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.lang.String.valueOf;
 import static java.lang.System.getProperty;
 import static java.time.temporal.ChronoUnit.WEEKS;
 import static java.util.stream.Collectors.joining;
@@ -21,27 +24,29 @@ public class PivotalApiTest {
 
     @Test
     public void getMetricsData() throws FileNotFoundException {
-        var digitalTeam = splitIntoList(getProperty("digital_team"));
-        int digitalProjectId = Integer.parseInt(getProperty("digitalProjectId"));
         var storiesDone = new ArrayList<String[]>();
         storiesDone.add(new String[] {"name", "stories done"});
-        storiesDone.addAll(getStoriesDone(digitalProjectId, digitalTeam));
 
-        var monitoringTeam = splitIntoList(getProperty("monitoring_team"));
-        int monitoringProjectId = Integer.parseInt(getProperty("monitoringProjectId"));
-        var storiesDoneMonitoring = getStoriesDone(monitoringProjectId, monitoringTeam);
+        int digitalProjectId = parseInt(getProperty("digitalProjectId"));
+        var digitalTeam = splitIntoList(getProperty("digital_team"));
+        var storiesDoneDigital = getStoriesDone(digitalProjectId, digitalTeam, false);
+        storiesDone.addAll(storiesDoneDigital);
 
         var notDevLabels = splitIntoList(getProperty("not_dev_labels"));
-        int notDevStoriesTotal = getNotDevStoriesCount(digitalProjectId, notDevLabels);
+        var notDevStoriesTotalDigital = valueOf(getNotDevStoriesCount(digitalProjectId, notDevLabels, false));
+        storiesDone.add(new String[] {"Digital not dev total", notDevStoriesTotalDigital});
 
-        storiesDoneMonitoring.add(new String[] {"Not dev total", String.valueOf(notDevStoriesTotal)});
+        var monitoringTeam = splitIntoList(getProperty("monitoring_team"));
+        int monitoringProjectId = parseInt(getProperty("monitoringProjectId"));
+        var storiesDoneMonitoring = getStoriesDone(monitoringProjectId, monitoringTeam, true);
+
         storiesDone.addAll(storiesDoneMonitoring);
 
         var csvOutputFile = new File(format("metrics_%s.csv", getLastWeekLabel()));
         try (var printWriter = new PrintWriter(csvOutputFile)) {
             storiesDone
                     .stream()
-                    .map(this::convertToCSV)
+                    .map(this::convertToCsv)
                     .forEach(printWriter::println);
         }
     }
@@ -52,8 +57,8 @@ public class PivotalApiTest {
                 .collect(toList());
     }
 
-    private int getNotDevStoriesCount(int projectId, List<String> notDevLabels) {
-        var pivotalApi = new PivotalApi(projectId, getLastWeekLabel());
+    private int getNotDevStoriesCount(int projectId, List<String> notDevLabels, boolean collectOnlyAccepted) {
+        var pivotalApi = new PivotalApi(projectId, getLastWeekLabel(), collectOnlyAccepted);
 
         return pivotalApi
                 .getStoriesDone()
@@ -75,37 +80,38 @@ public class PivotalApiTest {
                 .sum();
     }
 
-    private List<String[]> getStoriesDone(int projectId, List<String> persons) {
-        var digitalPivotalApi = new PivotalApi(projectId, getLastWeekLabel());
+    private List<String[]> getStoriesDone(int projectId, List<String> persons, boolean collectOnlyAccepted) {
+        var digitalPivotalApi = new PivotalApi(projectId, getLastWeekLabel(), collectOnlyAccepted);
         List<String[]> dataLines = new ArrayList<>();
 
         int totalStoriesDone = persons
                 .stream()
                 .mapToInt(member -> {
                     int storiesDone = digitalPivotalApi.getDoneStoriesPerPerson(member).size();
-                    dataLines.add(new String[] {member, String.valueOf(storiesDone)});
+                    dataLines.add(new String[] {member, valueOf(storiesDone)});
                     return storiesDone;
                 })
                 .sum();
 
-        dataLines.add(new String[] {"Total", String.valueOf(totalStoriesDone)});
+        dataLines.add(new String[] {"Total", valueOf(totalStoriesDone)});
 
         return dataLines;
     }
 
-    public String convertToCSV(String[] data) {
+    private String convertToCsv(String[] data) {
         return Stream.of(data)
                 .map(this::escapeSpecialCharacters)
                 .collect(joining(","));
     }
 
-    public String getLastWeekNumber() {
-        return String.valueOf(LocalDate
+    private String getLastWeekNumber() {
+        return valueOf(LocalDate
                 .now()
                 .minus(1, WEEKS)
                 .get(WeekFields.ISO.weekOfYear()));
     }
-    public String escapeSpecialCharacters(String data) {
+
+    private String escapeSpecialCharacters(String data) {
         var escapedData = data.replaceAll("\\R", " ");
         if (data.contains(",") || data.contains("\"") || data.contains("'")) {
             data = data.replace("\"", "\"\"");
@@ -114,7 +120,7 @@ public class PivotalApiTest {
         return escapedData;
     }
 
-    public String getLastWeekLabel() {
+    private String getLastWeekLabel() {
         return getProperty("week_label", "").isEmpty()
                 ? "21ww" + getLastWeekNumber()
                 : getProperty("week_label");

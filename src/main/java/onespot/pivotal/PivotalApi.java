@@ -7,18 +7,20 @@ import onespot.pivotal.api.resources.Story;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
+import static java.util.stream.Collectors.toList;
 import static onespot.pivotal.api.resources.Story.StoryFieldNames.*;
 
 public class PivotalApi {
     private PivotalTracker pivotalTracker = new PivotalTracker(getProperty("pivotal_token"));
     private List<Story> storiesDone;
 
-    public PivotalApi(int projectId, String label) {
-        this.storiesDone = getDoneStoriesForLabel(projectId, label);
+    public PivotalApi(int projectId, String label, boolean collectOnlyAccepted) {
+        this.storiesDone = getDoneStoriesForLabel(projectId, label, collectOnlyAccepted);
     }
 
-    public List<Story> getDoneStoriesForLabel(int projectId, String label) {
+    public List<Story> getDoneStoriesForLabel(int projectId, String label, boolean collectOnlyAccepted) {
         var project = pivotalTracker
                 .projects()
                 .id(projectId);
@@ -32,16 +34,18 @@ public class PivotalApi {
                 .withState(Story.StoryState.accepted)
                 .getAll();
 
-        var deliveredStories = stories
-                .withState(Story.StoryState.delivered)
-                .getAll();
+        if (!collectOnlyAccepted) {
+            var deliveredStories = stories
+                    .withState(Story.StoryState.delivered)
+                    .getAll();
 
-        var finishedStories = stories
-                .withState(Story.StoryState.finished)
-                .getAll();
+            var finishedStories = stories
+                    .withState(Story.StoryState.finished)
+                    .getAll();
 
-        acceptedStories.addAll(deliveredStories);
-        acceptedStories.addAll(finishedStories);
+            acceptedStories.addAll(deliveredStories);
+            acceptedStories.addAll(finishedStories);
+        }
 
         return acceptedStories;
     }
@@ -54,7 +58,7 @@ public class PivotalApi {
                         .stream()
                         .map(Person::getName)
                         .anyMatch(name -> name.contains(personName)))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     public List<Story> getStoriesDone() {
