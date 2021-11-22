@@ -42,7 +42,7 @@ public class PivotalApiTest {
 
         storiesDone.addAll(storiesDoneMonitoring);
 
-        var csvOutputFile = new File(format("metrics_%s.csv", getLastWeekLabel()));
+        var csvOutputFile = new File(format("metrics_%s.csv", getCurrentWeekLabel()));
         try (var printWriter = new PrintWriter(csvOutputFile)) {
             storiesDone
                     .stream()
@@ -58,7 +58,7 @@ public class PivotalApiTest {
     }
 
     private int getNotDevStoriesCount(int projectId, List<String> notDevLabels, boolean collectOnlyAccepted) {
-        var pivotalApi = new PivotalApi(projectId, getLastWeekLabel(), collectOnlyAccepted);
+        var pivotalApi = new PivotalApi(projectId, getCurrentWeekLabel(), collectOnlyAccepted);
 
         return pivotalApi
                 .getStoriesDone()
@@ -81,7 +81,7 @@ public class PivotalApiTest {
     }
 
     private List<String[]> getStoriesDone(int projectId, List<String> persons, boolean collectOnlyAccepted) {
-        var digitalPivotalApi = new PivotalApi(projectId, getLastWeekLabel(), collectOnlyAccepted);
+        var digitalPivotalApi = new PivotalApi(projectId, getCurrentWeekLabel(), collectOnlyAccepted);
         List<String[]> dataLines = new ArrayList<>();
 
         int totalStoriesDone = persons
@@ -111,6 +111,12 @@ public class PivotalApiTest {
                 .get(WeekFields.ISO.weekOfYear()));
     }
 
+    private String getCurrentWeekNumber() {
+        return valueOf(LocalDate
+                .now()
+                .get(WeekFields.ISO.weekOfYear()));
+    }
+
     private String escapeSpecialCharacters(String data) {
         var escapedData = data.replaceAll("\\R", " ");
         if (data.contains(",") || data.contains("\"") || data.contains("'")) {
@@ -123,6 +129,12 @@ public class PivotalApiTest {
     private String getLastWeekLabel() {
         return getProperty("week_label", "").isEmpty()
                 ? "21ww" + getLastWeekNumber()
+                : getProperty("week_label");
+    }
+
+    private String getCurrentWeekLabel() {
+        return getProperty("week_label", "").isEmpty()
+                ? "21ww" + getCurrentWeekNumber()
                 : getProperty("week_label");
     }
 }
