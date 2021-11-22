@@ -29,11 +29,11 @@ public class PivotalApiTest {
 
         int digitalProjectId = parseInt(getProperty("digitalProjectId"));
         var digitalTeam = splitIntoList(getProperty("digital_team"));
-        var storiesDoneDigital = getStoriesDone(digitalProjectId, digitalTeam, true);
+        var storiesDoneDigital = getStoriesDone(digitalProjectId, digitalTeam, false);
         storiesDone.addAll(storiesDoneDigital);
 
         var notDevLabels = splitIntoList(getProperty("not_dev_labels"));
-        var notDevStoriesTotalDigital = valueOf(getNotDevStoriesCount(digitalProjectId, notDevLabels, true));
+        var notDevStoriesTotalDigital = valueOf(getNotDevStoriesCount(digitalProjectId, notDevLabels, false));
         storiesDone.add(new String[] {"Digital not dev total", notDevStoriesTotalDigital});
 
         var monitoringTeam = splitIntoList(getProperty("monitoring_team"));
