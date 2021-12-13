@@ -79,6 +79,6 @@ public class Iteration {
     }
 
     public enum IterationFieldNames {
-        number,project_id,length,team_strength,story_ids,stories,start,finish,kind
+        number, project_id, length, team_strength, story_ids, stories, start, finish, kind
     }
 }

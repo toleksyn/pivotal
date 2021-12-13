@@ -11,11 +11,11 @@ public class Person {
     public String username;
     public String kind;
 
-    public enum PersonFieldNames {
-        id,name,email,initials,username,kind
-    }
-
     public String getName() {
         return name;
+    }
+
+    public enum PersonFieldNames {
+        id, name, email, initials, username, kind
     }
 }

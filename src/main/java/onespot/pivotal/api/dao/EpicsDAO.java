@@ -1,13 +1,12 @@
 package onespot.pivotal.api.dao;
 
-import java.util.List;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import com.google.gson.reflect.TypeToken;
-
 import onespot.pivotal.api.resources.Epic;
 import onespot.pivotal.rest.JsonRestClient;
+
+import java.util.List;
 
 /**
  * Created by ian on 4/3/15.
@@ -19,11 +18,12 @@ public class EpicsDAO extends DAO {
     }
 
     public List<Epic> get() {
-        return jsonRestClient.get(new TypeToken<List<Epic>>(){}.getType(), path, params);
+        return jsonRestClient.get(new TypeToken<List<Epic>>() {
+        }.getType(), path, params);
     }
 
     public EpicDAO id(int id) {
-        return new EpicDAO(jsonRestClient, "/"+id, params);
+        return new EpicDAO(jsonRestClient, "/" + id, params);
     }
 
 

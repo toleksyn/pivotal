@@ -5,9 +5,7 @@ import onespot.pivotal.api.resources.Person;
 import onespot.pivotal.api.resources.Story;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static java.lang.Boolean.parseBoolean;
 import static java.lang.System.getProperty;
 import static java.util.stream.Collectors.toList;
 import static onespot.pivotal.api.resources.Story.StoryFieldNames.*;

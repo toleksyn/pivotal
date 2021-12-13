@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 public class DumpFieldNames {
     public static void main(String[] args) {
         Class<?> cls = Epic.class;
-        System.out.println("public enum "+cls.getSimpleName()+"FieldNames {");
-        System.out.println("   "+
+        System.out.println("public enum " + cls.getSimpleName() + "FieldNames {");
+        System.out.println("   " +
                 Joiner.on(',').join(
                         Arrays.stream(cls.getFields())
                                 .map(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES::translateName)

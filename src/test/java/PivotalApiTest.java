@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static java.lang.Boolean.parseBoolean;
-import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -27,7 +25,7 @@ public class PivotalApiTest {
     @Test
     public void getMetricsData() throws FileNotFoundException {
         var storiesDone = new ArrayList<String[]>();
-        storiesDone.add(new String[] {"name", "stories done"});
+        storiesDone.add(new String[]{"name", "stories done"});
 
         int digitalProjectId = parseInt(getProperty("digitalProjectId"));
         var digitalTeam = splitIntoList(getProperty("digital_team"));
@@ -36,7 +34,7 @@ public class PivotalApiTest {
 
         var notDevLabels = splitIntoList(getProperty("not_dev_labels"));
         var notDevStoriesTotalDigital = valueOf(getNotDevStoriesCount(digitalProjectId, notDevLabels, false));
-        storiesDone.add(new String[] {"Digital not dev total", notDevStoriesTotalDigital});
+        storiesDone.add(new String[]{"Digital not dev total", notDevStoriesTotalDigital});
 
         var monitoringTeam = splitIntoList(getProperty("monitoring_team"));
         int monitoringProjectId = parseInt(getProperty("monitoringProjectId"));
@@ -55,7 +53,7 @@ public class PivotalApiTest {
 
     private List<String> splitIntoList(String string) {
         return Arrays.stream(string
-                .split(","))
+                        .split(","))
                 .collect(toList());
     }
 
@@ -73,9 +71,10 @@ public class PivotalApiTest {
                             .filter(label -> notDevLabels.contains(label.name))
                             .count();
 
-                    if(story.getName().contains("regression")) {
+                    if (story.getName().contains("regression")) {
                         notDevCount++;
-                    };
+                    }
+                    ;
 
                     return (int) notDevCount;
                 })
@@ -96,7 +95,7 @@ public class PivotalApiTest {
                             .mapToDouble(Story::getEstimate)
                             .mapToInt(estimate -> (int) estimate)
                             .sum();
-                    storiesAndStoryPointsPerPerson.add(new String[] {member, valueOf(storiesDone), valueOf(storyPoints)});
+                    storiesAndStoryPointsPerPerson.add(new String[]{member, valueOf(storiesDone), valueOf(storyPoints)});
 
                     return storiesDone;
                 })
@@ -107,8 +106,8 @@ public class PivotalApiTest {
                 .mapToInt(dataArray -> parseInt(dataArray[2]))
                 .sum();
 
-        storiesAndStoryPointsPerPerson.add(new String[] {"Total stories", valueOf(totalStoriesDone)});
-        storiesAndStoryPointsPerPerson.add(new String[] {"Total story points", valueOf(totalStoryPoints)});
+        storiesAndStoryPointsPerPerson.add(new String[]{"Total stories", valueOf(totalStoriesDone)});
+        storiesAndStoryPointsPerPerson.add(new String[]{"Total story points", valueOf(totalStoryPoints)});
 
         return storiesAndStoryPointsPerPerson;
     }

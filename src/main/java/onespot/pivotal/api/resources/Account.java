@@ -22,6 +22,6 @@ public class Account {
     }
 
     public enum AccountFieldNames {
-        id,name,plan,status,days_left,over_the_limit,created_at,updated_at,project_ids,kind
+        id, name, plan, status, days_left, over_the_limit, created_at, updated_at, project_ids, kind
     }
 }

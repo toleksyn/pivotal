@@ -15,7 +15,6 @@ import java.util.List;
  */
 public class ProjectMembershipsDAO extends DAO {
 
-
     public ProjectMembershipsDAO(JsonRestClient jsonRestClient, String path, Multimap<String, String> params) {
         super(jsonRestClient, path, params);
     }

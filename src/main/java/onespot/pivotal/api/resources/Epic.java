@@ -170,6 +170,6 @@ public class Epic {
     }
 
     public enum EpicFieldNames {
-        id,project_id,name,label_id,label,description,comment_ids,comments,follower_ids,followers,created_at,updated_at,after_id,before_id,url,kind
+        id, project_id, name, label_id, label, description, comment_ids, comments, follower_ids, followers, created_at, updated_at, after_id, before_id, url, kind
     }
 }

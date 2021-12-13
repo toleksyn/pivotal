@@ -2,7 +2,6 @@ package onespot.pivotal.rest;
 
 import com.google.common.collect.Multimap;
 import com.mashape.unirest.http.HttpResponse;
-
 import onespot.pivotal.api.ex.PivotalAPIException;
 
 /**

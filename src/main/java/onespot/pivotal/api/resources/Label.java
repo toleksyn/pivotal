@@ -32,6 +32,6 @@ public class Label {
     }
 
     public enum LabelFieldNames {
-        id,project_id,name,created_at,updated_at,counts
+        id, project_id, name, created_at, updated_at, counts
     }
 }

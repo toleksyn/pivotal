@@ -1,7 +1,6 @@
 package onespot.pivotal.api.dao;
 
 import com.google.common.collect.Multimap;
-
 import onespot.pivotal.api.resources.Epic;
 import onespot.pivotal.rest.JsonRestClient;
 
