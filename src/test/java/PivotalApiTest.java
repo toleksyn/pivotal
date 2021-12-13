@@ -1,4 +1,5 @@
 import onespot.pivotal.PivotalApi;
+import onespot.pivotal.api.resources.Story;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -82,20 +84,33 @@ public class PivotalApiTest {
 
     private List<String[]> getStoriesDone(int projectId, List<String> persons, boolean collectOnlyAccepted) {
         var digitalPivotalApi = new PivotalApi(projectId, getCurrentWeekLabel(), collectOnlyAccepted);
-        List<String[]> dataLines = new ArrayList<>();
+        List<String[]> storiesAndStoryPointsPerPerson = new ArrayList<>();
 
         int totalStoriesDone = persons
                 .stream()
                 .mapToInt(member -> {
-                    int storiesDone = digitalPivotalApi.getDoneStoriesPerPerson(member).size();
-                    dataLines.add(new String[] {member, valueOf(storiesDone)});
+                    var doneStoriesPerPerson = digitalPivotalApi.getDoneStoriesPerPerson(member);
+                    int storiesDone = doneStoriesPerPerson.size();
+                    var storyPoints = doneStoriesPerPerson
+                            .stream()
+                            .mapToDouble(Story::getEstimate)
+                            .mapToInt(estimate -> (int) estimate)
+                            .sum();
+                    storiesAndStoryPointsPerPerson.add(new String[] {member, valueOf(storiesDone), valueOf(storyPoints)});
+
                     return storiesDone;
                 })
                 .sum();
 
-        dataLines.add(new String[] {"Total", valueOf(totalStoriesDone)});
+        int totalStoryPoints = storiesAndStoryPointsPerPerson
+                .stream()
+                .mapToInt(dataArray -> parseInt(dataArray[2]))
+                .sum();
 
-        return dataLines;
+        storiesAndStoryPointsPerPerson.add(new String[] {"Total stories", valueOf(totalStoriesDone)});
+        storiesAndStoryPointsPerPerson.add(new String[] {"Total story points", valueOf(totalStoryPoints)});
+
+        return storiesAndStoryPointsPerPerson;
     }
 
     private String convertToCsv(String[] data) {

@@ -27,7 +27,7 @@ public class PivotalApi {
 
         var stories = project
                 .stories()
-                .withFields(owners, name, labels)
+                .withFields(owners, name, estimate, labels)
                 .withLabel(label);
 
         var acceptedStories = stories
